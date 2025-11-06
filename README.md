@@ -55,7 +55,17 @@ pip install -r requirements.txt
    python generate_excel.py
    ```
 
-3. Open `Mamaearth_ONDC_UnitEconomics.xlsx` to view the analysis
+3. Open `Mamaearth_ONDC_UnitEconomics.xlsx` (or the timestamped variant) to view the analysis
+
+4. **Run Streamlit Dashboard (Interactive):**
+   ```bash
+   # Activate your venv first
+   # Windows: venv\Scripts\activate
+   # Linux/Mac: source venv/bin/activate
+
+   streamlit run streamlit_app.py
+   ```
+   The app auto-loads the latest Excel (`Mamaearth_ONDC_UnitEconomics_20251106_032226.xlsx`) if present, or you can upload any generated Excel via the UI.
 
 ## Project Deliverables
 

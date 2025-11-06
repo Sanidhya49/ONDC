@@ -1,0 +1,389 @@
+{
+  "metadata": {
+    "source": "final.xlsx",
+    "total_products": 38,
+    "note": "Products loaded from final.xlsx with quantities extracted/matched"
+  },
+  "products": [
+    {
+      "product_name": "Mamaearth Onion Hair Oil",
+      "size": "100ml",
+      "selling_price": 399.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 18000,
+      "cost_of_goods_est": 119.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Onion Shampoo",
+      "size": "250ml",
+      "selling_price": 310.0,
+      "estimated_weight_g": 250,
+      "monthly_sales_units": 23400,
+      "cost_of_goods_est": 53.1,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Onion Conditioner",
+      "size": "250ml",
+      "selling_price": 349.0,
+      "estimated_weight_g": 250,
+      "monthly_sales_units": 18000,
+      "cost_of_goods_est": 104.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Rosemary Hair Growth Oil with Rosemary & Methi Dana for Promoting Hair Growth - 100 ml",
+      "size": "100ml",
+      "selling_price": 266.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 23400,
+      "cost_of_goods_est": 30.0,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Rosemary Shampoo",
+      "size": "250ml",
+      "selling_price": 310.0,
+      "estimated_weight_g": 250,
+      "monthly_sales_units": 18000,
+      "cost_of_goods_est": 93.0,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Argan Hair Mask",
+      "size": "200g",
+      "selling_price": 599.0,
+      "estimated_weight_g": 200,
+      "monthly_sales_units": 18000,
+      "cost_of_goods_est": 111.6,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Onion Hair Growth Serum (50ml)",
+      "size": "50ml",
+      "selling_price": 599.0,
+      "estimated_weight_g": 50,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 179.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Vitamin C and Turmeric Face Wash",
+      "size": "100ml",
+      "selling_price": 269.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 18000,
+      "cost_of_goods_est": 119.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Ubtan Natural Glow Face Wash with Turmeric & Saffron for Tan Removal – 100 ml",
+      "size": "100ml",
+      "selling_price": 269.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 26000,
+      "cost_of_goods_est": 30.0,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Tea Tree Pimple Control Face Wash with Tea Tree & Salicylic for Oily & Acne-Prone Skin - 100ml",
+      "size": "100ml",
+      "selling_price": 269.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 26000,
+      "cost_of_goods_est": 30.0,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Aloe Vera Face Wash",
+      "size": "100ml",
+      "selling_price": 269.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 22000,
+      "cost_of_goods_est": 80.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Rice Dewy Bright Face Wash With Rice Water & Niacinamide for Glass Skin - 200 ml",
+      "size": "200ml",
+      "selling_price": 549.0,
+      "estimated_weight_g": 200,
+      "monthly_sales_units": 26000,
+      "cost_of_goods_est": 30.0,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Charcoal Face Wash",
+      "size": "100ml",
+      "selling_price": 269.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 22000,
+      "cost_of_goods_est": 80.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Bye Bye Blemishes Face Wash",
+      "size": "100ml",
+      "selling_price": 269.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 22000,
+      "cost_of_goods_est": 80.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Vitamin C Daily Glow Face Cream With Vitamin C & Turmeric for Skin Illumination - 80 g",
+      "size": "80g",
+      "selling_price": 249.0,
+      "estimated_weight_g": 80,
+      "monthly_sales_units": 26000,
+      "cost_of_goods_est": 24.0,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Ubtan Natural Glow Face Wash with Turmeric & Saffron for Tan Removal – 150 ml",
+      "size": "150ml",
+      "selling_price": 399.0,
+      "estimated_weight_g": 150,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 119.69999999999999,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Vitamin C Night Cream",
+      "size": "50g",
+      "selling_price": 599.0,
+      "estimated_weight_g": 50,
+      "monthly_sales_units": 16000,
+      "cost_of_goods_est": 179.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Aqua Glow Face Wash With Himalayan Thermal Water and Hyaluronic Acid for Intense Hydration - 100ml",
+      "size": "100ml",
+      "selling_price": 399.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 119.69999999999999,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Honey Malai Cold Cream with Honey & Malai For Nourishing Glow - 200 g",
+      "size": "200g",
+      "selling_price": 349.0,
+      "estimated_weight_g": 200,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 104.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Bye Bye Blemishes Face Cream - 30g",
+      "size": "30g",
+      "selling_price": 471.0,
+      "estimated_weight_g": 30,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 141.29999999999998,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Vitamin C Face Serum",
+      "size": "30ml",
+      "selling_price": 1043.0,
+      "estimated_weight_g": 30,
+      "monthly_sales_units": 16000,
+      "cost_of_goods_est": 312.9,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Niacinamide Face Serum",
+      "size": "30ml",
+      "selling_price": 599.0,
+      "estimated_weight_g": 30,
+      "monthly_sales_units": 16000,
+      "cost_of_goods_est": 179.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Hyaluronic Acid Serum",
+      "size": "30ml",
+      "selling_price": 649.0,
+      "estimated_weight_g": 30,
+      "monthly_sales_units": 16000,
+      "cost_of_goods_est": 194.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Rice Face Scrub",
+      "size": "100g",
+      "selling_price": 349.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 20000,
+      "cost_of_goods_est": 104.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Ubtan Face Scrub",
+      "size": "100g",
+      "selling_price": 349.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 20000,
+      "cost_of_goods_est": 104.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Charcoal Face Mask - 200g",
+      "size": "200g",
+      "selling_price": 424.0,
+      "estimated_weight_g": 200,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 127.19999999999999,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Vitamin C Daily Glow Face Serum - 10ml",
+      "size": "10ml",
+      "selling_price": 225.0,
+      "estimated_weight_g": 10,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 67.5,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Vitamin C Body Lotion",
+      "size": "400ml",
+      "selling_price": 469.0,
+      "estimated_weight_g": 400,
+      "monthly_sales_units": 13500,
+      "cost_of_goods_est": 140.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Ubtan Body Lotion",
+      "size": "400ml",
+      "selling_price": 469.0,
+      "estimated_weight_g": 400,
+      "monthly_sales_units": 13500,
+      "cost_of_goods_est": 140.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Cocoa Rich Moisturizing Body Lotion with Cocoa Butter & Vitamin E for Intense Moisturization - 400 ml",
+      "size": "400ml",
+      "selling_price": 235.0,
+      "estimated_weight_g": 400,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 70.5,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Tea Tree Body Wash With Tea Tree and Neem For Skin Purification - 300 ml",
+      "size": "300ml",
+      "selling_price": 349.0,
+      "estimated_weight_g": 300,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 104.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Milky Soft Shampoo with Oats, Milk and Calendula for Babies - 400 ml",
+      "size": "400ml",
+      "selling_price": 444.0,
+      "estimated_weight_g": 400,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 133.2,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Milky Soft Body Lotion for Babies with Oats, Milk & Calendula – 200ml",
+      "size": "200ml",
+      "selling_price": 249.0,
+      "estimated_weight_g": 200,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 74.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Moisturizing Bathing Bar Soap For Babies, pack of 2*75g",
+      "size": "75g",
+      "selling_price": 221.0,
+      "estimated_weight_g": 75,
+      "monthly_sales_units": 15000,
+      "cost_of_goods_est": 66.3,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Lip Balm",
+      "size": "4g",
+      "selling_price": 299.0,
+      "estimated_weight_g": 4,
+      "monthly_sales_units": 27500,
+      "cost_of_goods_est": 89.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Tinted Lip Balm",
+      "size": "4g",
+      "selling_price": 299.0,
+      "estimated_weight_g": 4,
+      "monthly_sales_units": 27500,
+      "cost_of_goods_est": 89.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Mamaearth Under Eye Cream",
+      "size": "20g",
+      "selling_price": 349.0,
+      "estimated_weight_g": 20,
+      "monthly_sales_units": 10000,
+      "cost_of_goods_est": 104.7,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    },
+    {
+      "product_name": "Charcoal Black Long Stay Kajal with Vitamin C & Chamomile for 11-Hour Smudge-free Stay",
+      "size": "100ml",
+      "selling_price": 299.0,
+      "estimated_weight_g": 100,
+      "monthly_sales_units": 23400,
+      "cost_of_goods_est": 30.0,
+      "logistics_cost": 15,
+      "source": "final.xlsx"
+    }
+  ]
+}

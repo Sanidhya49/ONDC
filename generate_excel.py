@@ -24,29 +24,59 @@ DEFAULT_PARAMETERS = {
 
 
 def load_products():
-    """Load product data from JSON file"""
+    """Load product data from final.xlsx (via products_final.json) or fallback to products.json"""
+    # First try to load from final.xlsx processed data
+    try:
+        with open('data/products_final.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            if isinstance(data, dict) and 'products' in data:
+                print(f"Loaded {len(data['products'])} products from final.xlsx")
+                print(f"Source: {data.get('metadata', {}).get('source', 'final.xlsx')}")
+                return data['products']
+            elif isinstance(data, list):
+                print(f"Loaded {len(data)} products from final.xlsx")
+                return data
+    except FileNotFoundError:
+        print("Note: data/products_final.json not found. Trying to load from final.xlsx directly...")
+        # Try to load directly from final.xlsx
+        try:
+            from load_final_products import load_products_from_final_excel
+            products = load_products_from_final_excel()
+            if products:
+                print(f"Loaded {len(products)} products from final.xlsx")
+                return products
+        except Exception as e:
+            print(f"Could not load from final.xlsx: {e}")
+    
+    # Fallback to original products.json
     try:
         with open('data/products.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
-            # Handle both old format (list) and new format (dict with metadata)
             if isinstance(data, dict) and 'products' in data:
-                print(f"Loaded {len(data['products'])} products")
-                print(f"Metadata: {data.get('metadata', {}).get('scraped_date', 'N/A')}")
-                print(f"Scraped: {data.get('metadata', {}).get('scraped_count', 0)} | Estimated: {data.get('metadata', {}).get('estimated_count', 0)}")
+                print(f"Loaded {len(data['products'])} products from products.json (fallback)")
                 return data['products']
             elif isinstance(data, list):
+                print(f"Loaded {len(data)} products from products.json (fallback)")
                 return data
-            else:
-                print("Warning: Unexpected data format")
-                return []
     except FileNotFoundError:
-        print("Error: data/products.json not found. Please run scrape_real_data.py first.")
+        print("Error: Neither data/products_final.json nor data/products.json found.")
+        print("Please run: python load_final_products.py")
         return None
 
 
 def create_parameters_sheet(ws, params):
-    """Create Parameters sheet"""
+    """Create Parameters sheet with professional formatting"""
     ws.title = "Parameters"
+    
+    # Professional formatting
+    header_fill = PatternFill(start_color="2E75B6", end_color="2E75B6", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    border_style = Border(
+        left=Side(style='thin', color='D3D3D3'),
+        right=Side(style='thin', color='D3D3D3'),
+        top=Side(style='thin', color='D3D3D3'),
+        bottom=Side(style='thin', color='D3D3D3')
+    )
     
     # Headers
     ws['A1'] = "Parameter"
@@ -54,13 +84,11 @@ def create_parameters_sheet(ws, params):
     ws['C1'] = "Description"
     
     # Style headers
-    header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
-    header_font = Font(bold=True, color="FFFFFF")
-    
     for cell in ws[1]:
         cell.fill = header_fill
         cell.font = header_font
-        cell.alignment = Alignment(horizontal="center")
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+        cell.border = border_style
     
     # Parameter rows
     rows = [
@@ -75,62 +103,137 @@ def create_parameters_sheet(ws, params):
     ]
     
     for idx, (param, value, desc) in enumerate(rows, start=2):
-        ws[f'A{idx}'] = param
-        ws[f'B{idx}'] = value
-        ws[f'C{idx}'] = desc
-        ws[f'B{idx}'].number_format = '#,##0.00' if isinstance(value, float) else '#,##0'
+        row_fill = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid") if idx % 2 == 0 else PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+        
+        cell = ws.cell(row=idx, column=1, value=param)
+        cell.fill = row_fill
+        cell.border = border_style
+        cell.font = Font(size=10, bold=True)
+        cell.alignment = Alignment(vertical="center")
+        
+        cell = ws.cell(row=idx, column=2, value=value)
+        cell.fill = row_fill
+        cell.border = border_style
+        cell.font = Font(size=10)
+        cell.alignment = Alignment(horizontal="right", vertical="center")
+        cell.number_format = '#,##0.00' if isinstance(value, float) else '#,##0'
+        
+        cell = ws.cell(row=idx, column=3, value=desc)
+        cell.fill = row_fill
+        cell.border = border_style
+        cell.font = Font(size=9, color="555555")
+        cell.alignment = Alignment(vertical="center", wrap_text=True)
     
     # Adjust column widths
-    ws.column_dimensions['A'].width = 25
-    ws.column_dimensions['B'].width = 15
-    ws.column_dimensions['C'].width = 50
+    ws.column_dimensions['A'].width = 28
+    ws.column_dimensions['B'].width = 18
+    ws.column_dimensions['C'].width = 55
 
 
 def create_product_data_sheet(ws, products):
-    """Create Product_Data sheet"""
+    """Create Product_Data sheet with professional formatting"""
     ws.title = "Product_Data"
     
-    # Headers
-    headers = ["Product_Name", "Category", "Size", "Selling_Price", "Estimated_Weight_g", 
+    # Professional color scheme
+    header_fill = PatternFill(start_color="2E75B6", end_color="2E75B6", fill_type="solid")  # Professional blue
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    border_style = Border(
+        left=Side(style='thin', color='D3D3D3'),
+        right=Side(style='thin', color='D3D3D3'),
+        top=Side(style='thin', color='D3D3D3'),
+        bottom=Side(style='thin', color='D3D3D3')
+    )
+    
+    # Headers (Category column removed)
+    headers = ["Product_Name", "Size", "Selling_Price", "Estimated_Weight_g", 
                "Monthly_Sales_Units", "Cost_of_Goods_est", "Logistics_Cost", "Data_Source"]
     
     for col_idx, header in enumerate(headers, start=1):
         cell = ws.cell(row=1, column=col_idx, value=header)
-        cell.fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
-        cell.font = Font(bold=True, color="FFFFFF")
-        cell.alignment = Alignment(horizontal="center", wrap_text=True)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        cell.border = border_style
     
-    # Data rows
+    # Data rows with alternating row colors
     for row_idx, product in enumerate(products, start=2):
-        ws.cell(row=row_idx, column=1, value=product['product_name'])
-        ws.cell(row=row_idx, column=2, value=product.get('category', 'N/A'))
-        ws.cell(row=row_idx, column=3, value=product['size'])
-        ws.cell(row=row_idx, column=4, value=product['selling_price'])
-        ws.cell(row=row_idx, column=5, value=product['estimated_weight_g'])
-        ws.cell(row=row_idx, column=6, value=product['monthly_sales_units'])
-        ws.cell(row=row_idx, column=7, value=product['cost_of_goods_est'])
-        ws.cell(row=row_idx, column=8, value=product['logistics_cost'])
-        ws.cell(row=row_idx, column=9, value=product.get('source', 'N/A'))
+        row_fill = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid") if row_idx % 2 == 0 else PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+        
+        ws.cell(row=row_idx, column=1, value=product['product_name']).fill = row_fill
+        ws.cell(row=row_idx, column=1).border = border_style
+        ws.cell(row=row_idx, column=1).font = Font(size=10)
+        ws.cell(row=row_idx, column=1).alignment = Alignment(vertical="center", wrap_text=True)
+        
+        ws.cell(row=row_idx, column=2, value=product['size']).fill = row_fill
+        ws.cell(row=row_idx, column=2).border = border_style
+        ws.cell(row=row_idx, column=2).font = Font(size=10)
+        ws.cell(row=row_idx, column=2).alignment = Alignment(horizontal="center", vertical="center")
+        
+        ws.cell(row=row_idx, column=3, value=product['selling_price']).fill = row_fill
+        ws.cell(row=row_idx, column=3).border = border_style
+        ws.cell(row=row_idx, column=3).font = Font(size=10)
+        ws.cell(row=row_idx, column=3).alignment = Alignment(horizontal="right", vertical="center")
+        
+        ws.cell(row=row_idx, column=4, value=product['estimated_weight_g']).fill = row_fill
+        ws.cell(row=row_idx, column=4).border = border_style
+        ws.cell(row=row_idx, column=4).font = Font(size=10)
+        ws.cell(row=row_idx, column=4).alignment = Alignment(horizontal="right", vertical="center")
+        
+        ws.cell(row=row_idx, column=5, value=product['monthly_sales_units']).fill = row_fill
+        ws.cell(row=row_idx, column=5).border = border_style
+        ws.cell(row=row_idx, column=5).font = Font(size=10)
+        ws.cell(row=row_idx, column=5).alignment = Alignment(horizontal="right", vertical="center")
+        
+        ws.cell(row=row_idx, column=6, value=product['cost_of_goods_est']).fill = row_fill
+        ws.cell(row=row_idx, column=6).border = border_style
+        ws.cell(row=row_idx, column=6).font = Font(size=10)
+        ws.cell(row=row_idx, column=6).alignment = Alignment(horizontal="right", vertical="center")
+        
+        ws.cell(row=row_idx, column=7, value=product['logistics_cost']).fill = row_fill
+        ws.cell(row=row_idx, column=7).border = border_style
+        ws.cell(row=row_idx, column=7).font = Font(size=10)
+        ws.cell(row=row_idx, column=7).alignment = Alignment(horizontal="right", vertical="center")
+        
+        ws.cell(row=row_idx, column=8, value=product.get('source', 'final.xlsx')).fill = row_fill
+        ws.cell(row=row_idx, column=8).border = border_style
+        ws.cell(row=row_idx, column=8).font = Font(size=10, color="0066CC")
+        ws.cell(row=row_idx, column=8).alignment = Alignment(horizontal="center", vertical="center")
     
     # Format numbers
     for row in range(2, len(products) + 2):
-        ws[f'D{row}'].number_format = '#,##0'
-        ws[f'E{row}'].number_format = '#,##0'
-        ws[f'F{row}'].number_format = '#,##0'
-        ws[f'G{row}'].number_format = '#,##0.00'
-        ws[f'H{row}'].number_format = '#,##0.00'
+        ws[f'C{row}'].number_format = '#,##0'  # Selling_Price (was D, now C)
+        ws[f'D{row}'].number_format = '#,##0'  # Estimated_Weight_g (was E, now D)
+        ws[f'E{row}'].number_format = '#,##0'  # Monthly_Sales_Units (was F, now E)
+        ws[f'F{row}'].number_format = '#,##0.00'  # Cost_of_Goods_est (was G, now F)
+        ws[f'G{row}'].number_format = '#,##0.00'  # Logistics_Cost (was H, now G)
     
     # Adjust column widths
-    ws.column_dimensions['A'].width = 60
-    ws.column_dimensions['B'].width = 15
-    ws.column_dimensions['C'].width = 15
-    for col in ['D', 'E', 'F', 'G', 'H', 'I']:
-        ws.column_dimensions[col].width = 18
+    ws.column_dimensions['A'].width = 65  # Product_Name
+    ws.column_dimensions['B'].width = 12  # Size
+    ws.column_dimensions['C'].width = 15  # Selling_Price
+    ws.column_dimensions['D'].width = 18  # Estimated_Weight_g
+    ws.column_dimensions['E'].width = 20  # Monthly_Sales_Units
+    ws.column_dimensions['F'].width = 18  # Cost_of_Goods_est
+    ws.column_dimensions['G'].width = 15  # Logistics_Cost
+    ws.column_dimensions['H'].width = 15  # Data_Source
+    
+    # Freeze header row
+    ws.freeze_panes = 'A2'
 
 
 def create_unit_economics_sheet(ws, products, params):
-    """Create Unit_Economics sheet with formulas"""
+    """Create Unit_Economics sheet with formulas and professional formatting"""
     ws.title = "Unit_Economics"
+    
+    # Professional formatting
+    header_fill = PatternFill(start_color="2E75B6", end_color="2E75B6", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF", size=10)
+    border_style = Border(
+        left=Side(style='thin', color='D3D3D3'),
+        right=Side(style='thin', color='D3D3D3'),
+        top=Side(style='thin', color='D3D3D3'),
+        bottom=Side(style='thin', color='D3D3D3')
+    )
     
     # Headers
     headers = [
@@ -145,20 +248,27 @@ def create_unit_economics_sheet(ws, products, params):
     
     for col_idx, header in enumerate(headers, start=1):
         cell = ws.cell(row=1, column=col_idx, value=header)
-        cell.fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
-        cell.font = Font(bold=True, color="FFFFFF")
-        cell.alignment = Alignment(horizontal="center", wrap_text=True)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        cell.border = border_style
     
-    # Data and formulas
+    # Data and formulas with professional formatting
     for row_idx, product in enumerate(products, start=2):
+        row_fill = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid") if row_idx % 2 == 0 else PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+        
         # Product name
-        ws.cell(row=row_idx, column=1, value=product['product_name'])
+        cell = ws.cell(row=row_idx, column=1, value=product['product_name'])
+        cell.fill = row_fill
+        cell.border = border_style
+        cell.font = Font(size=9)
+        cell.alignment = Alignment(vertical="center", wrap_text=True)
         
-        # Selling price (from Product_Data)
-        ws.cell(row=row_idx, column=2, value=f"=Product_Data!D{row_idx}")
+        # Selling price (from Product_Data) - Column C now (was D)
+        ws.cell(row=row_idx, column=2, value=f"=Product_Data!C{row_idx}")
         
-        # Cost of Goods (from Product_Data)
-        ws.cell(row=row_idx, column=3, value=f"=Product_Data!G{row_idx}")
+        # Cost of Goods (from Product_Data) - Column F now (was G)
+        ws.cell(row=row_idx, column=3, value=f"=Product_Data!F{row_idx}")
         
         # Amazon Commission = Selling_Price * Amazon_Comm_pct
         ws.cell(row=row_idx, column=4, value=f"=B{row_idx}*Parameters!B2")
@@ -169,8 +279,8 @@ def create_unit_economics_sheet(ws, products, params):
         # Payment Gateway Fee = Selling_Price * Payment_Fee_pct
         ws.cell(row=row_idx, column=6, value=f"=B{row_idx}*Parameters!B4")
         
-        # Logistics Cost (from Product_Data)
-        ws.cell(row=row_idx, column=7, value=f"=Product_Data!H{row_idx}")
+        # Logistics Cost (from Product_Data) - Column G now (was H)
+        ws.cell(row=row_idx, column=7, value=f"=Product_Data!G{row_idx}")
         
         # Packaging Cost (from Parameters)
         ws.cell(row=row_idx, column=8, value="=Parameters!B5")
@@ -199,30 +309,56 @@ def create_unit_economics_sheet(ws, products, params):
         # Profit Change % = (Profit_ONDC - Profit_Amazon) / ABS(Profit_Amazon) * 100
         ws.cell(row=row_idx, column=16, value=f"=(O{row_idx}-N{row_idx})/ABS(N{row_idx})*100")
         
-        # Monthly Profit Amazon = Profit_per_unit_Amazon * Monthly_Sales_Units
-        ws.cell(row=row_idx, column=17, value=f"=N{row_idx}*Product_Data!F{row_idx}")
+        # Monthly Profit Amazon = Profit_per_unit_Amazon * Monthly_Sales_Units - Column E now (was F)
+        ws.cell(row=row_idx, column=17, value=f"=N{row_idx}*Product_Data!E{row_idx}")
         
-        # Monthly Profit ONDC = Profit_per_unit_ONDC * Monthly_Sales_Units
-        ws.cell(row=row_idx, column=18, value=f"=O{row_idx}*Product_Data!F{row_idx}")
+        # Monthly Profit ONDC = Profit_per_unit_ONDC * Monthly_Sales_Units - Column E now (was F)
+        ws.cell(row=row_idx, column=18, value=f"=O{row_idx}*Product_Data!E{row_idx}")
     
-    # Format numbers
+    # Format numbers and apply borders
     for row in range(2, len(products) + 2):
+        row_fill = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid") if row % 2 == 0 else PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
         for col in ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']:
+            cell = ws[f'{col}{row}']
+            cell.number_format = '#,##0.00'
+            cell.border = border_style
+            cell.fill = row_fill
+            cell.font = Font(size=9)
+            cell.alignment = Alignment(horizontal="right", vertical="center")
+    
+    # Special formatting for profit columns (highlight positive values)
+    for row in range(2, len(products) + 2):
+        # Profit columns - conditional formatting would be ideal, but we'll use standard formatting
+        for col in ['N', 'O', 'Q', 'R']:  # Profit columns
             ws[f'{col}{row}'].number_format = '#,##0.00'
     
     # Adjust column widths
     ws.column_dimensions['A'].width = 50
     for col in ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']:
-        ws.column_dimensions[col].width = 18
+        ws.column_dimensions[col].width = 16
+    
+    # Freeze header row
+    ws.freeze_panes = 'A2'
 
 
 def create_scenario_analysis_sheet(ws, products, params):
-    """Create Scenario_Analysis sheet"""
+    """Create Scenario_Analysis sheet with professional formatting"""
     ws.title = "Scenario_Analysis"
     
-    # Parameter change inputs (row 1-2)
+    # Professional formatting
+    header_fill = PatternFill(start_color="2E75B6", end_color="2E75B6", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    border_style = Border(
+        left=Side(style='thin', color='D3D3D3'),
+        right=Side(style='thin', color='D3D3D3'),
+        top=Side(style='thin', color='D3D3D3'),
+        bottom=Side(style='thin', color='D3D3D3')
+    )
+    
+    # Parameter change inputs (row 1-4)
     ws['A1'] = "Scenario Parameter Changes (%):"
-    ws['A1'].font = Font(bold=True, size=12)
+    ws['A1'].font = Font(bold=True, size=13, color="2E75B6")
+    ws['A1'].fill = PatternFill(start_color="E7F3FF", end_color="E7F3FF", fill_type="solid")
     
     scenario_params = [
         ("CAC_Amazon_pct_change", "CAC Amazon % Change"),
@@ -232,67 +368,121 @@ def create_scenario_analysis_sheet(ws, products, params):
     ]
     
     for idx, (param, label) in enumerate(scenario_params, start=2):
-        ws.cell(row=idx, column=1, value=label)
-        ws.cell(row=idx, column=2, value=0)  # Default 0% change
-        ws.cell(row=idx, column=2).number_format = '0.00%'
+        row_fill = PatternFill(start_color="F8F9FA", end_color="F8F9FA", fill_type="solid")
+        ws.cell(row=idx, column=1, value=label).font = Font(size=10, bold=True)
+        ws.cell(row=idx, column=1).fill = row_fill
+        # Set default to 0% but add example values in comments
+        default_value = 0 if idx <= 3 else 0  # Keep all at 0% by default
+        cell = ws.cell(row=idx, column=2, value=default_value)
+        cell.number_format = '0.00%'
+        cell.fill = row_fill
+        cell.border = border_style
+        cell.font = Font(size=10)
+        cell.alignment = Alignment(horizontal="right", vertical="center")
     
-    # Headers (row 4)
+    # Add explanatory note about why Profit_Change_vs_Base shows 0
+    note_row = 6
+    note_cell = ws.cell(row=note_row, column=1, value="Note: Profit_Change_vs_Base shows 0% because all scenario parameters are set to 0% change (no adjustments). To see changes, enter percentage values in cells B2-B5 above (e.g., 10% = 0.10, -5% = -0.05).")
+    note_cell.font = Font(size=9, italic=True, color="666666")
+    note_cell.fill = PatternFill(start_color="FFF9E6", end_color="FFF9E6", fill_type="solid")
+    ws.merge_cells(f'A{note_row}:H{note_row}')
+    note_cell.alignment = Alignment(vertical="center", wrap_text=True)
+    
+    # Headers (row 7, after scenario parameters and note)
     headers = ["Product_Name", "Base_Profit_ONDC", "Adjusted_CAC_ONDC", 
                "Adjusted_Logistics", "Adjusted_ONDC_Comm", 
                "Adjusted_Total_Cost_ONDC", "Adjusted_Profit_ONDC", "Profit_Change_vs_Base"]
     
     for col_idx, header in enumerate(headers, start=1):
-        cell = ws.cell(row=5, column=col_idx, value=header)
-        cell.fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
-        cell.font = Font(bold=True, color="FFFFFF")
-        cell.alignment = Alignment(horizontal="center", wrap_text=True)
+        cell = ws.cell(row=7, column=col_idx, value=header)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        cell.border = border_style
     
-    # Formulas for each product
-    for row_idx, product in enumerate(products, start=6):
+    # Formulas for each product (starting at row 8, after headers at row 7)
+    for row_idx, product in enumerate(products, start=8):
         # Product name
         ws.cell(row=row_idx, column=1, value=product['product_name'])
         
         # Base Profit ONDC (from Unit_Economics)
-        ws.cell(row=row_idx, column=2, value=f"=Unit_Economics!O{row_idx}")
+        # Note: Unit_Economics data starts at row 2, Scenario_Analysis data starts at row 8
+        # So row_idx - 6 gives correct offset (8 - 2 = 6)
+        unit_econ_row = row_idx - 6  # Adjust for header row difference
+        ws.cell(row=row_idx, column=2, value=f"=Unit_Economics!O{unit_econ_row}")
         
         # Adjusted CAC ONDC = Base CAC * (1 + CAC_ONDC_pct_change)
-        ws.cell(row=row_idx, column=3, value=f"=Parameters!B8*(1+B4)")
+        # B3 is row 3 which contains CAC_ONDC_pct_change
+        ws.cell(row=row_idx, column=3, value=f"=Parameters!B8*(1+B3)")
         
         # Adjusted Logistics = Base Logistics * (1 + Logistics_pct_change)
-        ws.cell(row=row_idx, column=4, value=f"=Unit_Economics!G{row_idx}*(1+B5)")
+        # B4 is row 4 which contains Logistics_pct_change
+        ws.cell(row=row_idx, column=4, value=f"=Unit_Economics!G{unit_econ_row}*(1+B4)")
         
         # Adjusted ONDC Commission = Selling_Price * ONDC_Comm_pct * (1 + ONDC_Comm_pct_change)
-        ws.cell(row=row_idx, column=5, value=f"=Unit_Economics!B{row_idx}*Parameters!B3*(1+B6)")
+        # B5 is row 5 which contains ONDC_Comm_pct_change
+        ws.cell(row=row_idx, column=5, value=f"=Unit_Economics!B{unit_econ_row}*Parameters!B3*(1+B5)")
         
         # Adjusted Total Cost ONDC = COGS + Adjusted_ONDC_Comm + Payment_Fee + Adjusted_Logistics + Adjusted_CAC_ONDC + Packaging + Other_Fees
-        ws.cell(row=row_idx, column=6, value=f"=Unit_Economics!C{row_idx}+E{row_idx}+Unit_Economics!F{row_idx}+D{row_idx}+C{row_idx}+Parameters!B5+Parameters!B6")
+        ws.cell(row=row_idx, column=6, value=f"=Unit_Economics!C{unit_econ_row}+E{row_idx}+Unit_Economics!F{unit_econ_row}+D{row_idx}+C{row_idx}+Parameters!B5+Parameters!B6")
         
         # Adjusted Profit ONDC = Selling_Price - Adjusted_Total_Cost_ONDC
-        ws.cell(row=row_idx, column=7, value=f"=Unit_Economics!B{row_idx}-F{row_idx}")
+        ws.cell(row=row_idx, column=7, value=f"=Unit_Economics!B{unit_econ_row}-F{row_idx}")
         
         # Profit Change vs Base = (Adjusted_Profit - Base_Profit) / ABS(Base_Profit) * 100
-        ws.cell(row=row_idx, column=8, value=f"=(G{row_idx}-B{row_idx})/ABS(B{row_idx})*100")
+        # Handle division by zero
+        ws.cell(row=row_idx, column=8, value=f"=IF(ABS(B{row_idx})>0, (G{row_idx}-B{row_idx})/ABS(B{row_idx})*100, 0)")
     
-    # Format numbers
-    for row in range(6, len(products) + 6):
+    # Format numbers and apply borders
+    for row in range(8, len(products) + 8):
+        row_fill = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid") if row % 2 == 0 else PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
         for col in ['B', 'C', 'D', 'E', 'F', 'G', 'H']:
-            ws[f'{col}{row}'].number_format = '#,##0.00'
+            cell = ws[f'{col}{row}']
+            cell.number_format = '#,##0.00'
+            cell.border = border_style
+            cell.fill = row_fill
+            cell.font = Font(size=9)
+            cell.alignment = Alignment(horizontal="right", vertical="center")
+        # Product name column
+        cell = ws[f'A{row}']
+        cell.border = border_style
+        cell.fill = row_fill
+        cell.font = Font(size=9)
+        cell.alignment = Alignment(vertical="center", wrap_text=True)
     
     # Adjust column widths
     ws.column_dimensions['A'].width = 50
     for col in ['B', 'C', 'D', 'E', 'F', 'G', 'H']:
         ws.column_dimensions[col].width = 18
+    
+    # Freeze header row
+    ws.freeze_panes = 'A8'
 
 
 def create_break_even_sheet(ws, products, params):
-    """Create Break_Even sheet"""
+    """Create Break_Even sheet with professional formatting"""
     ws.title = "Break_Even"
     
-    # Fixed costs input
+    # Professional formatting
+    header_fill = PatternFill(start_color="2E75B6", end_color="2E75B6", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    border_style = Border(
+        left=Side(style='thin', color='D3D3D3'),
+        right=Side(style='thin', color='D3D3D3'),
+        top=Side(style='thin', color='D3D3D3'),
+        bottom=Side(style='thin', color='D3D3D3')
+    )
+    
+    # Fixed costs input with professional styling
     ws['A1'] = "Fixed Costs (Monthly):"
-    ws['A1'].font = Font(bold=True)
+    ws['A1'].font = Font(bold=True, size=12, color="2E75B6")
+    ws['A1'].fill = PatternFill(start_color="E7F3FF", end_color="E7F3FF", fill_type="solid")
     ws['B1'] = f"=Parameters!B9"
     ws['B1'].number_format = '#,##0'
+    ws['B1'].font = Font(size=11, bold=True, color="2E75B6")
+    ws['B1'].fill = PatternFill(start_color="E7F3FF", end_color="E7F3FF", fill_type="solid")
+    ws['B1'].border = border_style
+    ws['B1'].alignment = Alignment(horizontal="right", vertical="center")
     
     # Headers
     headers = ["Product_Name", "Selling_Price", "Total_Variable_Cost_ONDC", 
@@ -300,9 +490,10 @@ def create_break_even_sheet(ws, products, params):
     
     for col_idx, header in enumerate(headers, start=1):
         cell = ws.cell(row=3, column=col_idx, value=header)
-        cell.fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
-        cell.font = Font(bold=True, color="FFFFFF")
-        cell.alignment = Alignment(horizontal="center", wrap_text=True)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        cell.border = border_style
     
     # Formulas for each product
     for row_idx, product in enumerate(products, start=4):
@@ -324,115 +515,54 @@ def create_break_even_sheet(ws, products, params):
         # Break-even revenue = Break_even_units * Selling_Price
         ws.cell(row=row_idx, column=6, value=f"=E{row_idx}*B{row_idx}")
     
-    # Format numbers
+    # Format numbers and apply borders
     for row in range(4, len(products) + 4):
+        row_fill = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid") if row % 2 == 0 else PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
         for col in ['B', 'C', 'D', 'E', 'F']:
-            ws[f'{col}{row}'].number_format = '#,##0.00'
+            cell = ws[f'{col}{row}']
+            cell.number_format = '#,##0.00'
+            cell.border = border_style
+            cell.fill = row_fill
+            cell.font = Font(size=9)
+            cell.alignment = Alignment(horizontal="right", vertical="center")
+        # Product name column
+        cell = ws[f'A{row}']
+        cell.border = border_style
+        cell.fill = row_fill
+        cell.font = Font(size=9)
+        cell.alignment = Alignment(vertical="center", wrap_text=True)
     
     # Adjust column widths
     ws.column_dimensions['A'].width = 50
     for col in ['B', 'C', 'D', 'E', 'F']:
         ws.column_dimensions[col].width = 18
+    
+    # Freeze header row
+    ws.freeze_panes = 'A4'
 
 
 def create_dashboard_sheet(ws, products, params):
-    """Create Dashboard sheet with metrics and charts"""
+    """Create Dashboard sheet with metrics and charts - professional formatting"""
     ws.title = "Dashboard"
     
-    # Title
+    # Professional title with background
+    title_fill = PatternFill(start_color="2E75B6", end_color="2E75B6", fill_type="solid")
     ws['A1'] = "ONDC vs Amazon Unit Economics Dashboard"
-    ws['A1'].font = Font(bold=True, size=16)
+    ws['A1'].font = Font(bold=True, size=18, color="FFFFFF")
+    ws['A1'].fill = title_fill
+    ws['A1'].alignment = Alignment(horizontal="center", vertical="center")
     ws.merge_cells('A1:D1')
+    ws.row_dimensions[1].height = 30
     
-    # Key Metrics Section
+    # Key Metrics Section with professional styling
     row = 3
-    ws.cell(row=row, column=1, value="Key Metrics").font = Font(bold=True, size=12)
+    metrics_header = ws.cell(row=row, column=1, value="Key Metrics")
+    metrics_header.font = Font(bold=True, size=14, color="2E75B6")
+    metrics_header.fill = PatternFill(start_color="E7F3FF", end_color="E7F3FF", fill_type="solid")
+    ws.merge_cells(f'A{row}:B{row}')
     row += 1
     
-    # Create helper data for chart with shortened product names (columns D-G, will be hidden)
-    # This creates a clean data table for the chart with readable labels
-    helper_start_row = row + 15
-    ws.cell(row=helper_start_row, column=4, value="Chart Data").font = Font(bold=True, size=10)
-    helper_start_row += 1
-    
-    # Headers
-    ws.cell(row=helper_start_row, column=4, value="Product")
-    ws.cell(row=helper_start_row, column=5, value="Amazon")
-    ws.cell(row=helper_start_row, column=6, value="ONDC")
-    helper_start_row += 1
-    
-    # Fill helper data - top 10 products with smart abbreviations
-    top_n = min(10, len(products))
-    
-    # Create abbreviation map for common product types
-    abbrev_map = {
-        'Hair Oil': 'Hair Oil',
-        'Shampoo': 'Shampoo',
-        'Conditioner': 'Cond',
-        'Face Wash': 'Face Wash',
-        'Face Cream': 'Cream',
-        'Face Serum': 'Serum',
-        'Face Scrub': 'Scrub',
-        'Face Mask': 'Mask',
-        'Body Lotion': 'Body Lot',
-        'Body Butter': 'Body But',
-        'Body Wash': 'Body Wash',
-        'Lip Balm': 'Lip Balm',
-        'Under Eye': 'Eye Cream',
-        'Kajal': 'Kajal',
-    }
-    
-    for idx in range(top_n):
-        product = products[idx]
-        product_name = product['product_name']
-        
-        # Create smart abbreviation
-        short_name = product_name.replace("Mamaearth ", "").replace("Mamaearth", "").strip()
-        
-        # Try to find abbreviation from map
-        found_abbrev = False
-        for key, abbrev in abbrev_map.items():
-            if key in short_name:
-                # Extract the main ingredient/category
-                words = short_name.split()
-                main_words = []
-                for word in words[:2]:  # First 2 words usually contain key info
-                    if word.lower() not in ['for', 'with', 'and', 'the', 'of']:
-                        main_words.append(word)
-                if main_words:
-                    short_name = " ".join(main_words) + " " + abbrev
-                else:
-                    short_name = abbrev
-                found_abbrev = True
-                break
-        
-        # If no abbreviation found, use first 2-3 key words
-        if not found_abbrev:
-            words = short_name.split()
-            key_words = []
-            skip_words = ['for', 'with', 'and', 'the', 'of', 'in', 'on', 'at', 'to', 'a', 'an', 'daily', 'glow']
-            for word in words:
-                if word.lower() not in skip_words and len(key_words) < 3:
-                    key_words.append(word)
-                if len(key_words) >= 3:
-                    break
-            if key_words:
-                short_name = " ".join(key_words)
-        
-        # Final limit to 18 characters
-        if len(short_name) > 18:
-            short_name = short_name[:15] + "..."
-        
-        # Write to helper table
-        ws.cell(row=helper_start_row, column=4, value=short_name)
-        ws.cell(row=helper_start_row, column=5, value=f"=Unit_Economics!N{idx+2}")
-        ws.cell(row=helper_start_row, column=6, value=f"=Unit_Economics!O{idx+2}")
-        helper_start_row += 1
-    
-    # Hide helper columns (they're just for chart data)
-    ws.column_dimensions['D'].hidden = True
-    ws.column_dimensions['E'].hidden = True
-    ws.column_dimensions['F'].hidden = True
+    # Chart helper data removed - no chart section needed
     
     metrics = [
         ("Average Profit per Unit (Amazon)", "=AVERAGE(Unit_Economics!N2:N" + str(len(products)+1) + ")"),
@@ -444,72 +574,39 @@ def create_dashboard_sheet(ws, products, params):
         ("Best Performing Product (ONDC)", "=INDEX(Unit_Economics!A2:A" + str(len(products)+1) + ",MATCH(MAX(Unit_Economics!O2:O" + str(len(products)+1) + "),Unit_Economics!O2:O" + str(len(products)+1) + ",0))")
     ]
     
-    for label, formula in metrics:
-        ws.cell(row=row, column=1, value=label)
-        ws.cell(row=row, column=2, value=formula)
-        ws.cell(row=row, column=2).number_format = '#,##0.00'
+    # Professional metric boxes
+    border_style = Border(
+        left=Side(style='thin', color='D3D3D3'),
+        right=Side(style='thin', color='D3D3D3'),
+        top=Side(style='thin', color='D3D3D3'),
+        bottom=Side(style='thin', color='D3D3D3')
+    )
+    
+    for idx, (label, formula) in enumerate(metrics, start=0):
+        row_fill = PatternFill(start_color="F8F9FA", end_color="F8F9FA", fill_type="solid") if idx % 2 == 0 else PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+        
+        label_cell = ws.cell(row=row, column=1, value=label)
+        label_cell.font = Font(size=10, bold=True)
+        label_cell.fill = row_fill
+        label_cell.border = border_style
+        label_cell.alignment = Alignment(vertical="center")
+        
+        value_cell = ws.cell(row=row, column=2, value=formula)
+        value_cell.number_format = '#,##0.00'
+        value_cell.font = Font(size=11, bold=True, color="2E75B6")
+        value_cell.fill = row_fill
+        value_cell.border = border_style
+        value_cell.alignment = Alignment(horizontal="right", vertical="center")
         row += 1
     
-    # Charts Section
-    chart_row = row + 2
-    ws.cell(row=chart_row, column=1, value="Charts").font = Font(bold=True, size=12)
-    
-    # Get reference to Unit_Economics sheet for chart data
-    unit_economics_sheet = None
-    for sheet in ws.parent.worksheets:
-        if sheet.title == "Unit_Economics":
-            unit_economics_sheet = sheet
-            break
-    
-    if unit_economics_sheet:
-        # Bar Chart: Profit per Unit Amazon vs ONDC - Top 10 Products
-        chart1 = BarChart()
-        chart1.type = "col"
-        chart1.style = 10
-        chart1.title = "Profit per Unit: Amazon vs ONDC (Top 10 Products)"
-        chart1.y_axis.title = "Profit (INR)"
-        chart1.x_axis.title = ""
-        chart1.legend.position = 'r'  # Right side
-        
-        # Use helper data with shortened names
-        # Helper data starts at row + 17 (after headers)
-        chart_data_start = row + 17  # Start of data rows in helper section (after "Chart Data" header and column headers)
-        top_n = min(10, len(products))
-        chart_data_end = chart_data_start + top_n - 1  # 10 products
-        
-        # Data from helper columns (E = Amazon column 5, F = ONDC column 6)
-        data = Reference(ws, min_col=5, min_row=chart_data_start, max_row=chart_data_end, max_col=6)
-        # Categories from helper column D (shortened names, column 4)
-        cats = Reference(ws, min_col=4, min_row=chart_data_start, max_row=chart_data_end)
-        
-        chart1.add_data(data, titles_from_data=True)
-        chart1.set_categories(cats)
-        
-        # Better label formatting - angled labels for readability
-        chart1.x_axis.tickLblAngle = -45  # 45 degree angle for readability
-        chart1.x_axis.tickLblSkip = 0  # Show all labels
-        chart1.x_axis.majorTickMark = "out"  # Show tick marks
-        
-        # Format Y-axis for better readability
-        chart1.y_axis.majorGridlines = None  # Cleaner look
-        
-        chart1.height = 10
-        chart1.width = 22
-        ws.add_chart(chart1, "A" + str(chart_row + 2))
-        
-        # Add a note about product labels
-        ws.cell(row=chart_row + 13, column=1, value="Note: Chart shows top 10 products with shortened names for readability. Full product names available in Unit_Economics sheet.")
-        ws.cell(row=chart_row + 13, column=1).font = Font(italic=True, size=9)
-    else:
-        ws.cell(row=chart_row + 2, column=1, value="[Note: Chart will be generated when Unit_Economics sheet data is available]")
-    
-    # Note: Additional charts can be added here
-    # For now, the Excel file will have the bar chart
-    # Users can add more charts manually in Excel if needed
+    # Note: Chart section removed as per user request
+    # Users can create charts manually in Excel if needed using the Unit_Economics data
     
     # Adjust column widths
-    ws.column_dimensions['A'].width = 35
-    ws.column_dimensions['B'].width = 25
+    ws.column_dimensions['A'].width = 40
+    ws.column_dimensions['B'].width = 28
+    ws.column_dimensions['C'].width = 15
+    ws.column_dimensions['D'].width = 15
 
 
 def main():
